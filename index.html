@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Assets · ai5nines</title>
+    <!-- The poster must not draw until the artwork is loaded, and the script that
+		loads it is deferred, so the fetch is started here instead: the browser can
+		begin it while still parsing, in parallel with fetching app.js.
+
+		`as="fetch"` with `crossorigin` is deliberate. The artwork is read as text via
+		fetch(), so it is a fetch-destination request; preloading it as an image would
+		prime a different cache entry and cost a second download. `crossorigin` puts
+		the preload in the same CORS + credentials mode the fetch() uses (see
+		poster.js), which is what lets the request actually be reused. -->
+    <link rel="preload" href="ai5nines.svg" as="fetch" crossorigin="anonymous">
+    <link rel="icon" href="ai5nines-128.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aldrich&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
+</head>
+
+<body>
+    <main class="page">
+        <header>
+            <h1>Assets</h1>
+            <h2>Preview</h2>
+        </header>
+
+        <div class="stage" id="stage">
+            <canvas class="poster" id="poster" role="img" aria-label="Poster preview"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="field">
+                <label class="label" for="issue">Issue number</label>
+                <div class="field__control">
+                    <span class="field__hash" aria-hidden="true">#</span>
+                    <input class="field__input" id="issue" type="text" value="13" autocomplete="off"
+                        autocapitalize="off" spellcheck="false" enterkeyhint="done">
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="button" id="download" type="button" disabled>Download PNG</button>
+            <p class="status" id="status" role="status">Loading…</p>
+        </div>
+
+        <noscript>
+            <p class="status">This tool needs JavaScript to draw and export the poster.</p>
+        </noscript>
+    </main>
+</body>
+
+</html>
