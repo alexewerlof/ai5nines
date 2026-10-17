@@ -1,83 +1,45 @@
 # ai5nines assets
 
-Brand artwork for the ai5nines newsletter, plus the internal tool that turns it into
-ready-to-post images.
+Brand artwork for the [ai5nines](https://ai5nines.com) newsletter, and the small tool that
+turns it into ready-to-post issue images.
 
-Published as a GitHub Pages site on <https://assets.ai5nines.com>.
+Published at <https://assets.ai5nines.com>.
 
-## Contents
+## The tool
 
-| Path                                   | Purpose                                                                          |
-| -------------------------------------- | -------------------------------------------------------------------------------- |
-| `index.html`                           | The page: markup and links only. No styles or script inline.                     |
-| `styles.css`                           | Page styling.                                                                    |
-| `app.js`                               | Page behaviour: the issue-number field, the download button, sizing the preview. |
-| `poster.js`                            | The design: poster layout, canvas surfaces, and loading `ai5nines.svg`.          |
-| `ai5nines.svg`                         | Brand artwork. The single source of truth for the logo.                          |
-| `ai5nines-512.png`, `ai5nines-128.png` | Raster copies. `128` is used as the page favicon.                                |
-| `CNAME`                                | Tells GitHub Pages to serve this site at `assets.ai5nines.com`.                  |
-| `.nojekyll`                            | Stops Pages from running Jekyll over the published files.                        |
+Open the page, type an issue number, then download the PNG — or copy it and paste it
+straight into a post.
 
-## The Assets tool
+- The export is exactly **1200×630** and is named `ai5nines-issue-<number>.png`.
+- **Copy image** puts that same picture on the clipboard, so a post can be filled without
+  saving a file first.
+- The field takes a number from **1 to 999**.
+- The number is set very large, so the design is tuned for the short issue numbers the
+  newsletter actually has rather than for long values.
 
-Open the page, type an issue number, download the PNG. The export is written at
-exactly 1200×630 and named `ai5nines-issue-<number>.png`.
+## What the image looks like
 
-The field takes up to three digits. The number is drawn very large, so the design is
-tuned for the short issues the newsletter actually has rather than for long values.
+The wordmark sits above the issue number. Both are centred, with a generous amount of
+empty space around them.
 
-1200×630 is the social/post preview size Substack recommends, and the ratio its
-preview frames actually crop to. Substack's help centre also calls preview images
-14:10, but that figure is wrong — 1200×630 is 40:21 — and an export built to 14:10
-gets cropped when it is uploaded.
+That empty space is deliberate, and it is what makes the image work. Substack does not
+show an uploaded picture as it is — it crops it to a different shape for every placement
+the image appears in, and the narrowest of those is a small square thumbnail that keeps
+only the middle 630 of the image's 1200 units. Putting the mark in the centre, and
+keeping it small enough to fit inside that square, means no placement can cut it.
 
-The tool must be served over HTTP. Opening `index.html` straight from disk fails,
-because browsers block `fetch()` of `ai5nines.svg` from a `file://` URL.
+The **Crops** row on the page shows the image in each of those shapes at once. If the
+mark is whole in the narrowest frame there it is whole everywhere, so the row doubles as
+a preview of what Substack will show and as the quickest way to see that a change has
+not broken one of the smaller frames.
 
-### Local use
+## Files
 
-```
-python3 -m http.server 8000
-```
+| Path                       | What it is                                                           |
+| -------------------------- | -------------------------------------------------------------------- |
+| `index.html`, `styles.css` | The page itself.                                                     |
+| `js/`                      | The tool's code, one small module per job.                           |
+| `img/`                     | The brand artwork, including `ai5nines.svg`, the source of the logo. |
 
-Then open <http://localhost:8000/>.
-
-### Editing the design
-
-Everything about how the poster looks lives at the top of `poster.js`: the `POSTER`
-size, `COLORS`, `LABEL`, and the `DESIGN` block holding the margin, logo size and
-spacing. `drawPoster()` itself is short and reads as the layout.
-
-Two rules keep the design honest:
-
-- **One drawing path.** `drawPoster()` renders both the on-screen preview and the
-  export, onto surfaces of different pixel sizes. Never add a separate preview- or
-  export-only drawing path, or the two will drift apart.
-- **Fixed poster space.** The design is authored in a 1200×630 space and scaled to
-  fit the target surface, so every measurement is in the same units. Only the export
-  surface is ever exactly 1200×630.
-
-### Why the logo is preloaded
-
-`index.html` preloads `ai5nines.svg` with `as="fetch" crossorigin`. Both parts matter,
-because the artwork is read as _text_ by `fetch()` in `poster.js` rather than drawn
-straight from an `<img>`:
-
-- `as="image"` would prime a different cache entry and cost a **second** download.
-- Dropping `crossorigin` produces a request whose credentials mode does not match the
-  `fetch()`, so the browser downloads the file twice and logs a warning.
-
-If the way `poster.js` loads the artwork ever changes, change the preload to match —
-otherwise it silently stops helping.
-
-## Publishing
-
-1. Push to the branch configured under _Settings → Pages_.
-2. DNS: a `CNAME` record for `assets` pointing at `<owner>.github.io`. It must be
-   DNS-only — a Cloudflare-style orange-cloud proxy in front of it breaks the
-   certificate.
-3. In _Settings → Pages_, set the custom domain to `assets.ai5nines.com` and enable
-   **Enforce HTTPS**.
-
-Note that GitHub Pages on a **private** repository needs a paid plan (Pro, Team or
-Enterprise).
+If you are working on the tool, [`AGENTS.md`](AGENTS.md) covers how it is put together,
+where the design constants live, and how to check a change.
